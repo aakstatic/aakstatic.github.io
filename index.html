@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CutieCart — The Cutest Love Shop 💖</title>
+    <meta name="description" content="CutieCart: A cute little love shop for kisses, hugs, movie nights, and all the adorable things.">
+    <meta name="theme-color" content="#ff66a3" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html" aria-label="CutieCart home">
+          <span class="logo">💖</span>
+          <span class="brand-text">CutieCart</span>
+        </a>
+
+        <nav class="nav">
+          <a href="./index.html" class="nav-link">Home</a>
+          <a href="./checkout.html" class="nav-link nav-cart">
+            <span>Checkout</span>
+            <span class="cart-badge" id="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="carousel" id="hero-carousel" aria-roledescription="carousel">
+            <button class="carousel-btn prev" aria-label="Previous">❮</button>
+            <div class="slides">
+              <div class="slide active" aria-hidden="false">
+                <div class="slide-content">
+                  <h1>Welcome to <span class="brand-pink">CutieCart</span> 🛒✨</h1>
+                  <p>The shopping platform for the cutiest cutie in the world. 😊</p>
+                  <a href="#shop" class="btn primary">Shop the Love</a>
+                </div>
+                <img class="sticker" src="./assets/img/welcome.webp" alt="Welcome sticker" />
+              </div>
+              <div class="slide" aria-hidden="true">
+                <div class="slide-content">
+                  <h2>Birthday Countdown 🎂</h2>
+                  <div class="bday-count" aria-live="polite">
+                    <div class="unit">
+                      <div class="num" id="bdayDays">--</div>
+                      <div class="label">Days</div>
+                    </div>
+                    <div class="unit">
+                      <div class="num" id="bdayHours">--</div>
+                      <div class="label">Hours</div>
+                    </div>
+                    <div class="unit">
+                      <div class="num" id="bdayMins">--</div>
+                      <div class="label">Mins</div>
+                    </div>
+                    <div class="unit">
+                      <div class="num" id="bdaySecs">--</div>
+                      <div class="label">Secs</div>
+                    </div>
+                  </div>
+                  <button id="bdayRemindBtn" class="btn" hidden>Remind Him 💌</button>
+                </div>
+                <img class="sticker" src="assets/img/bday.webp" alt="Bubu Dudu hearts sticker" />
+              </div>
+              <div class="slide" aria-hidden="true">
+                <div class="slide-content">
+                  <h2>Soft Launch 💗</h2>
+                  <p>Every order comes with bonus attention and forehead kisses. 😘</p>
+                  <a href="#shop" class="btn">Aww, Yes Please</a>
+                </div>
+                <img class="sticker" src="./assets/img/soft-launch.gif" alt="Bubududu panda sticker" />
+              </div>
+            </div>
+            <button class="carousel-btn next" aria-label="Next">❯</button>
+            <div class="dots" role="tablist" aria-label="Carousel Pagination"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="shop" class="product-section">
+        <div class="container">
+          <div class="section-head">
+            <h2>Exclusive Collection of Priceless Products 🥰</h2>
+            <p>Not available on Myntra, Nykaa and Ajio.</p>
+          </div>
+          <div id="productGrid" class="product-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="cta-banner">
+        <div class="container" style="display:flex; justify-content:center; padding: 12px 0 36px;">
+          <a href="./checkout.html" class="btn primary large">Proceed to Checkout</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>Made with <span class="heart">❤</span> for Pratibha.</p>
+      </div>
+    </footer>
+
+    <!-- Config (user-provided overrides) -->
+    <script src="./assets/js/config.js" defer></script>
+    <!-- Fallback example config -->
+    <script src="./assets/js/config.example.js" defer></script>
+
+    <!-- App scripts -->
+    <script src="./assets/js/cart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+    <script src="./assets/js/app.js" defer></script>
+  </body>
+  
+</html>
+
+

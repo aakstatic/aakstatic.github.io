@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout — CutieCart 💝</title>
+    <meta name="theme-color" content="#ff66a3" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <span class="logo">💖</span>
+          <span class="brand-text">CutieCart</span>
+        </a>
+        <nav class="nav">
+          <a href="./index.html" class="nav-link">Home</a>
+          <a href="./checkout.html" class="nav-link nav-cart">
+            <span>Checkout</span>
+            <span class="cart-badge" id="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="container">
+        <h1>Checkout 💌</h1>
+        <div class="grid-2">
+          <section class="panel">
+            <h3>Order Details</h3>
+            <div id="cartSummary" class="cart-summary"></div>
+            <div class="summary-total"><span>Total</span><strong id="summaryTotal"></strong></div>
+            <div id="shippingNote" class="tiny" style="margin-top:8px;">Free shipping to Canada for all orders</div>
+            <div id="couponStatus" class="tiny" style="margin-top:6px;"></div>
+            <button id="applyCouponBtn" class="btn" type="button">Apply Coupon</button>
+          </section>
+
+          <section class="panel">
+            <h3>Delivery & Love Info</h3>
+            <form id="checkoutForm">
+              <!-- Name and email removed as requested -->
+              <div class="field">
+                <label class="label">Payment method</label>
+                <div class="radio-group" id="paymentOptions">
+                  <label class="radio-card">
+                    <input type="radio" name="payment" value="time-with-me" required checked />
+                    <span>🤤 Seggsy time</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="payment" value="gaming-date" />
+                    <span>🎮 Play games with me</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="payment" value="movie-night" />
+                    <span>🎬 Watch movie selected by me</span>
+                  </label>
+                </div>
+              </div>
+              <!-- Coupon section moved to popup -->
+              <div class="field">
+                <label class="label" for="note">Sweet note</label>
+                <textarea id="note" name="note" class="textarea" rows="3" placeholder="Tell me something cute..."></textarea>
+              </div>
+              <div class="actions">
+                <a class="btn" href="./index.html">Back to shop</a>
+                <button id="placeOrderBtn" type="submit" class="btn primary">Place Order 💝</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Coupon Popup -->
+    <div id="couponPopup" class="popup-overlay" hidden>
+      <div class="popup-content">
+        <h3>Apply Coupons 💸</h3>
+        <div class="coupon-list">
+          <details class="coupon-item">
+            <summary><span>PRINCESS</span> <button class="apply-btn" data-coupon="princess">Apply</button></summary>
+            <p>Special princess discount for the queen of my heart. 50% off everything!</p>
+          </details>
+          <details class="coupon-item">
+            <summary><span>DaWifey</span> <button class="apply-btn" data-coupon="wifey">Apply</button></summary>
+            <p>My wifey gets free stuff because she's amazing. Everything free!</p>
+          </details>
+        </div>
+        <button id="closeCouponPopup" class="btn">Close</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>Made with <span class="heart">❤</span> for Pratibha.</p>
+      </div>
+    </footer>
+
+    <script src="./assets/js/config.js" defer></script>
+    <script src="./assets/js/config.example.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+    <script src="./assets/js/cart.js" defer></script>
+    <script src="./assets/js/checkout.js" defer></script>
+  </body>
+</html>
+
+

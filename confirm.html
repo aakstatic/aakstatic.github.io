@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order Confirmed — CutieCart 💞</title>
+    <meta name="theme-color" content="#ff66a3" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <span class="logo">💖</span>
+          <span class="brand-text">CutieCart</span>
+        </a>
+        <nav class="nav">
+          <a href="./index.html" class="nav-link">Home</a>
+          <a href="./checkout.html" class="nav-link nav-cart">
+            <span>Checkout</span>
+            <span class="cart-badge" id="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="container confirm">
+        <h1>Yay! Order Confirmed 🎉</h1>
+        <p>Thank you for your adorable order. I can't wait to deliver all the love and cuteness!</p>
+        <p>Your order id: <span id="orderId" class="order-id">—</span></p>
+        <div>
+          <a href="./index.html" class="btn">Back to Home</a>
+        </div>
+      </div>
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>Made with <span class="heart">❤</span> for Pratibha.</p>
+      </div>
+    </footer>
+
+    <script src="./assets/js/cart.js" defer></script>
+    <script src="./assets/js/confirm.js" defer></script>
+  </body>
+</html>
+
+
