@@ -4,12 +4,36 @@
 
   const cartCountEl = document.getElementById('cart-count');
   const summaryWrap = document.getElementById('cartSummary');
-  const summaryTotal = document.getElementById('summaryTotal');
+  const summaryTotal = null;
   const form = document.getElementById('checkoutForm');
-  const couponPrincess = document.getElementById('coupon_princess');
-  const couponWifey = document.getElementById('coupon_dawifey');
   const couponStatus = document.getElementById('couponStatus');
+  const applyCouponBtn = document.getElementById('applyCouponBtn');
+  const couponPopup = document.getElementById('couponPopup');
+  const closeCouponPopup = document.getElementById('closeCouponPopup');
+  const paymentOptions = document.getElementById('paymentOptions');
+  const appliedCoupons = new Set();
+  const customerNameEl = document.getElementById('customerName');
+  const nameEditMsg = document.getElementById('nameEditMsg');
+  const deliveryDateEl = document.getElementById('deliveryDate');
+  const deliveryTimeEl = document.getElementById('deliveryTime');
   let statusEl;
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function setDefaultDeliveryIfEmpty() {
+    // Set today's date (local) and next full hour as defaults if empty
+    if (deliveryDateEl && !deliveryDateEl.value) {
+      const now = new Date();
+      const tzOffsetMs = now.getTimezoneOffset() * 60000;
+      const localISO = new Date(now.getTime() - tzOffsetMs).toISOString();
+      deliveryDateEl.value = localISO.slice(0, 10);
+    }
+    if (deliveryTimeEl && !deliveryTimeEl.value) {
+      const now = new Date();
+      let hh = now.getHours() + 1;
+      if (hh > 23) hh = 23;
+      deliveryTimeEl.value = `${pad2(hh)}:00`;
+    }
+  }
 
   function setStatus(message, isError) {
     if (!form) return;
@@ -32,36 +56,33 @@
     if (cartCountEl) cartCountEl.textContent = String(window.CutieCart.getCartCount());
   }
 
-  function getAppliedCoupons() {
-    const list = [];
-    if (couponPrincess && couponPrincess.checked) list.push('PRINCESS');
-    if (couponWifey && couponWifey.checked) list.push('DaWifey');
-    return list;
-  }
+  function getAppliedCoupons() { return Array.from(appliedCoupons); }
 
   function updateCouponStatus() {
     if (!couponStatus) return;
     const applied = getAppliedCoupons();
-    couponStatus.textContent = applied.length ? `Applied: ${applied.join(' · ')}` : 'No coupon applied';
+    // couponStatus.textContent = applied.length ? `Applied: ${applied.join(' · ')}` : 'No coupon applied';
+    if (applyCouponBtn) applyCouponBtn.textContent = applied.length ? `Applied: ${applied.join(', ')}` : 'Apply Coupon';
+    if (paymentOptions) {
+      if (applied.length > 0) paymentOptions.classList.add('greyed-out');
+      else paymentOptions.classList.remove('greyed-out');
+    }
   }
 
   function renderSummary() {
-    if (!summaryWrap || !summaryTotal) return;
+    if (!summaryWrap) return;
     const items = window.CutieCart.getItems();
     if (!items.length) {
       summaryWrap.innerHTML = '<p>Your cart is empty. Go add some cuteness! 💗</p>';
-      summaryTotal.textContent = '❤ 0';
       return;
     }
     summaryWrap.innerHTML = items.map(i => `
       <div class="summary-item">
-        <span>${i.title} × ${i.qty}</span>
+        <span class="summary-title">${i.title}</span>
+        <span class="summary-qty">× ${i.qty}</span>
       </div>
     `).join('');
-    const base = window.CutieCart.getCartTotal();
-    const applied = getAppliedCoupons();
-    const label = applied.length ? ` (coupons: ${applied.join(', ')})` : '';
-    summaryTotal.textContent = `${base} items${label}`;
+    // Total removed since there is no currency; count remains visible per item lines
   }
 
   function makeOrderId() {
@@ -111,6 +132,8 @@
       items: order.items.map(i => `${i.title} x ${i.qty}`).join('\n'),
       total: `${order.total} items`,
       coupons: (order.coupons || []).join(', '),
+      delivery_date: order.deliveryDate || '',
+      delivery_time: order.deliveryTime || '',
     };
     if (!window.emailjs) {
       setStatus('Email service failed to load. Check network/CORS.', true);
@@ -123,11 +146,35 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Popup controls
+    if (applyCouponBtn) applyCouponBtn.addEventListener('click', () => { if (couponPopup) couponPopup.hidden = false; });
+    if (closeCouponPopup) closeCouponPopup.addEventListener('click', () => { if (couponPopup) couponPopup.hidden = true; });
+    if (couponPopup) couponPopup.addEventListener('click', (e) => { if (e.target === couponPopup) couponPopup.hidden = true; });
+
+    // Apply/remove inside popup
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.apply-btn');
+      if (!btn) return;
+      const which = btn.getAttribute('data-coupon');
+      if (which === 'princess') { appliedCoupons.has('PRINCESS') ? appliedCoupons.delete('PRINCESS') : appliedCoupons.add('PRINCESS'); }
+      if (which === 'wifey') { /* locked */ }
+      updateCouponStatus();
+      renderSummary();
+      if (couponPopup) couponPopup.hidden = true;
+    });
     updateCartBadge();
     renderSummary();
-    if (couponPrincess) couponPrincess.addEventListener('change', () => { updateCouponStatus(); renderSummary(); });
-    if (couponWifey) couponWifey.addEventListener('change', () => { updateCouponStatus(); renderSummary(); });
     updateCouponStatus();
+    setDefaultDeliveryIfEmpty();
+
+    // Lock name to Pratibha and show message when changed
+    if (customerNameEl) {
+      const resetName = () => { if (customerNameEl.value !== 'Pratibha') customerNameEl.value = 'Pratibha'; };
+      customerNameEl.addEventListener('input', () => { resetName(); if (nameEditMsg) nameEditMsg.hidden = false; });
+      customerNameEl.addEventListener('keydown', () => { if (nameEditMsg) nameEditMsg.hidden = false; });
+      customerNameEl.addEventListener('focus', () => { if (nameEditMsg) nameEditMsg.hidden = true; });
+      customerNameEl.addEventListener('blur', () => { if (nameEditMsg) nameEditMsg.hidden = true; });
+    }
 
     if (!form) return;
     form.addEventListener('submit', async (e) => {
@@ -139,25 +186,34 @@
       }
 
       const data = new FormData(form);
-      const name = '';
+      const name = 'Pratibha';
       const email = '';
       const payment = String(data.get('payment') || '').trim();
       const note = String(data.get('note') || '').trim();
+      // Ensure defaults if user cleared inputs
+      setDefaultDeliveryIfEmpty();
+      const deliveryDate = deliveryDateEl && deliveryDateEl.value ? deliveryDateEl.value : '';
+      const deliveryTime = deliveryTimeEl && deliveryTimeEl.value ? deliveryTimeEl.value : '';
 
       const paymentOptions = {
-        'time-with-me': '⏰ Quality time together',
-        'gaming-date': '🎮 Gaming date',
-        'movie-night': '🎬 Movie night',
-        'walk-and-talk': '🚶 Walk & talk',
-        'surprise-date': '🎁 Surprise date',
+        'time-with-me': '🤤 Seggsy time',
+        'gaming-date': '🎮 Play games',
+        'movie-night': '🎬 Watch movie',
       };
+
+      const appliedCouponsList = getAppliedCoupons();
+      const basePaymentLabel = paymentOptions[payment] || payment;
+      const paymentLabelFinal = appliedCouponsList.length
+        ? `Not applicable (Free via ${appliedCouponsList.join(', ')})`
+        : basePaymentLabel;
 
       const order = {
         id: makeOrderId(),
-        name, email, payment, paymentLabel: paymentOptions[payment] || payment,
+        name, email, payment, paymentLabel: paymentLabelFinal,
         note, items, total: window.CutieCart.getCartTotal(),
         createdAt: new Date().toISOString(),
-        coupons: getAppliedCoupons(),
+        coupons: appliedCouponsList,
+        deliveryDate, deliveryTime,
       };
 
       const btn = document.getElementById('placeOrderBtn');

@@ -17,7 +17,10 @@
         <p style="margin:0 0 16px; font-family: ui-monospace, Menlo, Consolas, monospace; background:#fff0f6; border:1px dashed #ffc2de; display:inline-block; padding:6px 10px; border-radius:8px;">{{order_id}}</p>
 
         <p style="margin:0 0 8px; font-weight:700; color:#8f0f51;">Buyer</p>
-        <p style="margin:0 0 16px;">{{buyer_name}} &lt;{{buyer_email}}&gt;</p>
+        <p style="margin:0 0 16px;">{{buyer_name}} &lt;</p>
+
+        <p style="margin:0 0 8px; font-weight:700; color:#8f0f51;">Delivery</p>
+        <p style="margin:0 0 16px;">Date: <strong>{{delivery_date}}</strong> &nbsp; Time: <strong>{{delivery_time}}</strong></p>
 
         <p style="margin:0 0 8px; font-weight:700; color:#8f0f51;">Payment Method</p>
         <p style="margin:0 0 16px;">{{payment_method}}</p>
@@ -30,9 +33,8 @@
           {{items}}
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #ffc2de; padding-top:12px;">
-          <div style="font-weight:700; color:#8f0f51;">Total</div>
-          <div style="font-weight:900; color:#e5388c;">{{total}}</div>
+        <div style="border-top:1px dashed #ffc2de; padding-top:12px; color:#8f0f51;">
+          <div><strong>Coupons</strong>: {{coupons}}</div>
         </div>
       </div>
 
