@@ -14,7 +14,7 @@
     } catch (_) {}
   })();
   const cartCountEl = document.getElementById('cart-count');
-  const bday = { month: 7, day: 28 }; // Jan = 0
+  const bday = { month: 0, day: 15 }; // Jan = 0
 
   // Products
   const products = [
