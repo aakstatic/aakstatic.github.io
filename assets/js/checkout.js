@@ -18,6 +18,16 @@
   const deliveryTimeEl = document.getElementById('deliveryTime');
   let statusEl;
 
+  // Persist dry-run across navigation if provided via URL
+  (function syncDryRunFromUrlParam() {
+    try {
+      const q = new URLSearchParams(location.search);
+      const v = q.get('dry');
+      if (v === '1') localStorage.setItem('cutie.dry_run', '1');
+      if (v === '0') localStorage.setItem('cutie.dry_run', '0');
+    } catch (_) {}
+  })();
+
   function pad2(n) { return String(n).padStart(2, '0'); }
   function setDefaultDeliveryIfEmpty() {
     // Set today's date (local) and next full hour as defaults if empty

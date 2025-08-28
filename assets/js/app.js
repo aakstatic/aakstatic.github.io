@@ -3,6 +3,16 @@
   'use strict';
 
   const productGrid = document.getElementById('productGrid');
+
+  // Persist dry-run across navigation if provided via URL
+  (function syncDryRunFromUrlParam() {
+    try {
+      const q = new URLSearchParams(location.search);
+      const v = q.get('dry');
+      if (v === '1') localStorage.setItem('cutie.dry_run', '1');
+      if (v === '0') localStorage.setItem('cutie.dry_run', '0');
+    } catch (_) {}
+  })();
   const cartCountEl = document.getElementById('cart-count');
   const bday = { month: 7, day: 28 }; // Jan = 0
 
