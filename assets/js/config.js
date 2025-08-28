@@ -4,7 +4,8 @@ window.CutieConfig = window.CutieConfig || {
   EMAILJS_SERVICE_ID: 'service_z1ywtbb',
   EMAILJS_TEMPLATE_ID: 'template_75kyxsv',
   EMAILJS_BDAY_TEMPLATE_ID: 'template_hg1tgbe',
-  NOTIFY_EMAIL: 'aakug28@gmail.com'
+  NOTIFY_EMAIL: 'aakug28@gmail.com',
+  EMAILJS_DRY_RUN: false
 };
 
 

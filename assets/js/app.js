@@ -4,7 +4,7 @@
 
   const productGrid = document.getElementById('productGrid');
   const cartCountEl = document.getElementById('cart-count');
-  const bday = { month: 0, day: 15 }; // Jan = 0
+  const bday = { month: 7, day: 28 }; // Jan = 0
 
   // Products
   const products = [
@@ -274,22 +274,35 @@
 
     btn.addEventListener('click', async () => {
       try {
+        showLoading(true, 'Sending birthday reminder…');
+        // Dry-run mode: simulate without EmailJS
+        const params = new URLSearchParams(location.search);
+        const qDry = params.get('dry');
+        const isDry = (qDry === '1') || (qDry !== '0' && ((localStorage.getItem('cutie.dry_run') === '1') || (window.CutieConfig && window.CutieConfig.EMAILJS_DRY_RUN === true) || (location.hostname === 'localhost' || location.hostname === '127.0.0.1')));
+        if (isDry) {
+          await new Promise(r => setTimeout(r, 6000));
+          const afterClose = () => { btn.textContent = 'Reminder Sent ✓'; btn.disabled = true; };
+          showLoadingDone('Reminder sent! Aakash better surprenge you now. 😤', afterClose);
+          return;
+        }
         if (!window.emailjs || !window.CutieConfig) return alert('Email service not ready');
         const { EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_BDAY_TEMPLATE_ID, NOTIFY_EMAIL } = window.CutieConfig;
         if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_BDAY_TEMPLATE_ID) return alert('Birthday email not configured');
         window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-        const params = {
+        const payload = {
           to_email: NOTIFY_EMAIL || '',
           subject: 'It\'s her birthday today! 🎂',
           message: 'Reminder to buy a gift and plan something sweet today.',
           date: new Date().toDateString(),
         };
-        await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_BDAY_TEMPLATE_ID, params);
-        btn.textContent = 'Reminder Sent ✓';
-        btn.disabled = true;
+        await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_BDAY_TEMPLATE_ID, payload);
+        const afterClose = () => { btn.textContent = 'Reminder Sent ✓'; btn.disabled = true; };
+        showLoadingDone('Reminder sent! Aakash better surprenge you now. 😤', afterClose);
+        return;
       } catch (e) {
         console.warn('Birthday email failed', e);
-        alert('Could not send birthday reminder.');
+        showLoadingDone('Could not send reminder. Close to continue.');
+        return;
       }
     });
   }
@@ -302,6 +315,53 @@
     initBirthday();
     syncAllQuantities();
   });
+
+  // Loading overlay in homepage context
+  let loadingCloseCb = null;
+  function ensureOverlay() {
+    let el = document.getElementById('cutie-loading');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'cutie-loading';
+      el.className = 'loading-overlay';
+      el.hidden = true;
+      el.innerHTML = '<div><img class="loading-gif" src="./assets/img/drive.gif" alt="Loading"/><div class="loading-text">Please wait…</div><div class="loading-actions" style="margin-top:10px;"><button id="cutie-loading-close" class="btn" style="display:none;">Close</button></div></div>';
+      document.body.appendChild(el);
+      const closeBtn = el.querySelector('#cutie-loading-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          el.hidden = true;
+          if (typeof loadingCloseCb === 'function') { const cb = loadingCloseCb; loadingCloseCb = null; cb(); }
+        });
+      }
+    }
+    return el;
+  }
+  function showLoading(show, text) {
+    const el = ensureOverlay();
+    if (typeof text === 'string') {
+      const t = el.querySelector('.loading-text');
+      if (t) t.textContent = text;
+    }
+    const img = el.querySelector('.loading-gif');
+    if (img && show) { img.src = './assets/img/drive.gif'; }
+    const spinner = img || el.querySelector('.spinner');
+    const closeBtn = el.querySelector('#cutie-loading-close');
+    if (spinner) spinner.style.display = show ? 'block' : 'none';
+    if (closeBtn) closeBtn.style.display = 'none';
+    el.hidden = !show;
+  }
+  function showLoadingDone(text, onClose) {
+    const el = ensureOverlay();
+    const t = el.querySelector('.loading-text');
+    const img = el.querySelector('.loading-gif');
+    const closeBtn = el.querySelector('#cutie-loading-close');
+    if (t) t.textContent = text || 'Done.';
+    if (img) { img.src = './assets/img/sent.gif'; img.style.display = 'block'; }
+    if (closeBtn) closeBtn.style.display = 'inline-flex';
+    el.hidden = false;
+    loadingCloseCb = typeof onClose === 'function' ? onClose : null;
+  }
 })();
 
 

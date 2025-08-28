@@ -52,6 +52,20 @@
     statusEl.style.color = isError ? '#8f0f51' : '#166534';
   }
 
+  // Determine if we should simulate (no EmailJS calls)
+  function isDryRun() {
+    try {
+      const cfg = window.CutieConfig || {};
+      const params = new URLSearchParams(location.search);
+      if (params.get('dry') === '1') return true;
+      if (params.get('dry') === '0') return false;
+      if (localStorage.getItem('cutie.dry_run') === '1') return true;
+      if (cfg && cfg.EMAILJS_DRY_RUN === true) return true;
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return true;
+    } catch (_) {}
+    return false;
+  }
+
   function updateCartBadge() {
     if (cartCountEl) cartCountEl.textContent = String(window.CutieCart.getCartCount());
   }
@@ -90,6 +104,15 @@
   }
 
   async function sendEmail(order) {
+    showLoading(true, 'Sending order…');
+    // Simulate when dry-run is enabled
+    if (isDryRun()) {
+      console.debug('[CutieCart] DRY RUN: order payload', order);
+      setStatus('Simulated send (dry-run). No EmailJS credits used.', false);
+      await new Promise(r => setTimeout(r, 7000));
+      showLoading(false);
+      return { dryRun: true };
+    }
     // Ensure EmailJS is available
     if (!window.emailjs) {
       setStatus('Email service not loaded. Trying to load and send again…', true);
@@ -142,7 +165,8 @@
     console.debug('[CutieCart] Sending email with params:', params);
     return window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
       .then((res) => { setStatus('Order email sent successfully ✓', false); console.debug('[CutieCart] EmailJS success:', res); return res; })
-      .catch((err) => { setStatus('Email send failed. Check console and config.', true); console.warn('[CutieCart] EmailJS error', err); throw err; });
+      .catch((err) => { setStatus('Email send failed. Check console and config.', true); console.warn('[CutieCart] EmailJS error', err); throw err; })
+      .finally(() => { showLoading(false); });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -221,19 +245,72 @@
 
       try {
         const result = await sendEmail(order);
+        const proceed = () => {
+          sessionStorage.setItem('cutiecart.lastOrderId', order.id);
+          window.CutieCart.clearCart();
+          window.location.href = './confirm.html';
+        };
         if (result && result.skipped) {
-          alert('Email sending skipped due to configuration. Please check config.js.');
+          showLoadingDone('Email skipped (config). Close to continue.', proceed);
+          return;
         }
+        showLoadingDone('Order placed! Sit back and watch the peasant(me) work for you.', proceed);
+        return;
       } catch (err) {
         console.warn('Email failed', err);
+        const btnReset = () => { const b = document.getElementById('placeOrderBtn'); if (b) { b.disabled = false; b.textContent = 'Place Order 💝'; } };
+        showLoadingDone('Email failed. Close to continue.', btnReset);
+        return;
       }
-
-      // Persist last order id for confirmation page
-      sessionStorage.setItem('cutiecart.lastOrderId', order.id);
-      window.CutieCart.clearCart();
-      window.location.href = './confirm.html';
     });
   });
+
+  // Loading overlay helpers
+  let loadingCloseCb = null;
+  function ensureOverlay() {
+    let el = document.getElementById('cutie-loading');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'cutie-loading';
+      el.className = 'loading-overlay';
+      el.hidden = true;
+      el.innerHTML = '<div><img class="loading-gif" src="./assets/img/drive.gif" alt="Loading"/><div class="loading-text">Please wait…</div><div class="loading-actions" style="margin-top:10px;"><button id="cutie-loading-close" class="btn" style="display:none;">Close</button></div></div>';
+      document.body.appendChild(el);
+      const closeBtn = el.querySelector('#cutie-loading-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          el.hidden = true;
+          if (typeof loadingCloseCb === 'function') { const cb = loadingCloseCb; loadingCloseCb = null; cb(); }
+        });
+      }
+    }
+    return el;
+  }
+  function showLoading(show, text) {
+    const el = ensureOverlay();
+    if (typeof text === 'string') {
+      const t = el.querySelector('.loading-text');
+      if (t) t.textContent = text;
+    }
+    const img = el.querySelector('.loading-gif');
+    if (img && show) { img.src = './assets/img/drive.gif'; }
+    const spinner = img || el.querySelector('.spinner');
+    const closeBtn = el.querySelector('#cutie-loading-close');
+    if (spinner) spinner.style.display = show ? 'block' : 'none';
+    if (closeBtn) closeBtn.style.display = 'none';
+    el.hidden = !show;
+  }
+  function showLoadingDone(text, onClose) {
+    const el = ensureOverlay();
+    const t = el.querySelector('.loading-text');
+    const img = el.querySelector('.loading-gif');
+    const closeBtn = el.querySelector('#cutie-loading-close');
+    if (t) t.textContent = text || 'Done.';
+    if (img) { img.src = './assets/img/sent.gif'; img.style.display = 'block'; }
+    if (closeBtn) closeBtn.style.display = 'inline-flex';
+    el.hidden = false;
+    loadingCloseCb = typeof onClose === 'function' ? onClose : null;
+  }
 })();
 
 
