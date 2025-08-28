@@ -224,6 +224,58 @@
     carousel.addEventListener('mouseenter', stopAuto);
     carousel.addEventListener('mouseleave', startAuto);
 
+    // Touch swipe for phones (horizontal only; don't break vertical scroll)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchActive = false;
+    let swiping = false;
+    const SWIPE_THRESHOLD = 30; // px to trigger slide
+    const ANGLE_GUARD = 1.2; // require horizontal to be 1.2x vertical to qualify
+
+    function onTouchStart(e) {
+      if (!e.touches || e.touches.length !== 1) return;
+      touchActive = true;
+      swiping = false;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      stopAuto();
+    }
+    function onTouchMove(e) {
+      if (!touchActive) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (!swiping) {
+        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * ANGLE_GUARD) {
+          swiping = true;
+        } else if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx) * ANGLE_GUARD) {
+          // Vertical scroll dominates; cancel swipe tracking
+          touchActive = false;
+          swiping = false;
+          return;
+        }
+      }
+      if (swiping) {
+        // Prevent page scroll while horizontal swiping
+        e.preventDefault();
+      }
+    }
+    function onTouchEnd(e) {
+      if (!touchActive) { startAuto(); return; }
+      const endX = (e.changedTouches && e.changedTouches[0].clientX) || touchStartX;
+      const dx = endX - touchStartX;
+      touchActive = false;
+      if (swiping && Math.abs(dx) > SWIPE_THRESHOLD) {
+        if (dx < 0) { show(index + 1); } else { show(index - 1); }
+      }
+      startAuto();
+    }
+    function onTouchCancel() { touchActive = false; swiping = false; startAuto(); }
+
+    carousel.addEventListener('touchstart', onTouchStart, { passive: true });
+    carousel.addEventListener('touchmove', onTouchMove, { passive: false });
+    carousel.addEventListener('touchend', onTouchEnd);
+    carousel.addEventListener('touchcancel', onTouchCancel);
+
     show(0);
     startAuto();
   }

@@ -85,11 +85,24 @@
   function updateCouponStatus() {
     if (!couponStatus) return;
     const applied = getAppliedCoupons();
-    // couponStatus.textContent = applied.length ? `Applied: ${applied.join(' · ')}` : 'No coupon applied';
+    // Update primary button label
     if (applyCouponBtn) applyCouponBtn.textContent = applied.length ? `Applied: ${applied.join(', ')}` : 'Apply Coupon';
+    // Grey out payment options when any coupon is applied
     if (paymentOptions) {
       if (applied.length > 0) paymentOptions.classList.add('greyed-out');
       else paymentOptions.classList.remove('greyed-out');
+    }
+    // Reflect state inside popup buttons
+    const princessBtn = document.querySelector('.apply-btn[data-coupon="princess"]');
+    if (princessBtn) {
+      const isApplied = applied.includes('PRINCESS');
+      princessBtn.textContent = isApplied ? 'Remove' : 'Apply';
+      princessBtn.classList.toggle('applied-coupon', isApplied);
+    }
+    const wifeyBtn = document.querySelector('.apply-btn[data-coupon="wifey"]');
+    if (wifeyBtn) {
+      wifeyBtn.textContent = 'Locked';
+      wifeyBtn.disabled = true;
     }
   }
 
@@ -194,7 +207,7 @@
       if (which === 'wifey') { /* locked */ }
       updateCouponStatus();
       renderSummary();
-      if (couponPopup) couponPopup.hidden = true;
+      // Keep popup open so user can remove/undo immediately
     });
     updateCartBadge();
     renderSummary();

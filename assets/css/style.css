@@ -167,6 +167,9 @@ main { flex: 1; }
 .popup-content { width: min(560px, 92%); background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; }
 .coupon-list { display: grid; gap: 10px; margin-top: 10px; }
 .coupon-item summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; background: #fff7fb; border: 1px solid var(--border); border-radius: 12px; }
+.coupon-item summary .summary-left { display: inline-flex; align-items: center; gap: 8px; color: var(--pink-900); font-weight: 700; }
+.coupon-item summary .chev { transition: transform .2s ease; color: var(--muted); }
+.coupon-item[open] summary .chev { transform: rotate(180deg); }
 .coupon-item p { margin: 8px 0 0; color: var(--muted); padding: 0 6px 6px; }
 .apply-btn { padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: linear-gradient(135deg, #fff, #ffe4ef); font-weight: 700; cursor: pointer; }
 .apply-btn.applied-coupon { background: var(--pink-600); color: #fff; border-color: var(--pink-600); }
@@ -210,8 +213,13 @@ main { flex: 1; }
 }
 @media (max-width: 600px) {
   /* Reflow carousel for small screens */
+  .carousel { height: 480px; }
+  .slides { height: 100%; }
+  .slide { height: 100%; min-height: 100%; }
   .slide { padding: 16px 16px 64px 16px; }
-  .slide-content { max-width: 100%; }
+  /* Center slide contents vertically inside fixed height */
+  .slide.active { display: flex; flex-direction: column; justify-content: center; }
+  .slide-content { max-width: 100%; margin: 0 auto 10px; text-align: center; }
   .sticker { position: static; width: 160px; margin: 10px auto 0; animation: floaty 4s ease-in-out infinite; }
   .carousel-btn { top: auto; bottom: 48px; transform: none; }
   .carousel-btn.prev { left: 10px; }
